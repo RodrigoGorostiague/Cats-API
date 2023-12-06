@@ -13,12 +13,12 @@ app.get('/nuevo-endpoint', (req, res) => {
 
 app.get('/cats', (req, res) => {
     const cats = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 1000; i++) {
         cats.push({
             id: i,
             name: faker.animal.cat(),
             color: faker.color.human(),
-            Image: faker.image.urlPicsumPhotos()
+            Image: faker.image.urlLoremFlickr({ category: 'cats' })
         })
     }
     res.json(cats)
@@ -45,7 +45,7 @@ app.get('/cats', (req, res) => {
     const { name, color } = req.query;
     if (!name || !color) {
         res.status(404).json({
-            error: 'Error 404, Gatitos no found'
+            error: 'Error 404, Gatitos not found'
         })
     }else{
     res.json({
