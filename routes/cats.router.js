@@ -1,52 +1,72 @@
 const express = require('express');
-const { faker } = require('@faker-js/faker')
+const CatsService = require('../services/cat.service');
+
 
 const router = express.Router();
+const service = new CatsService();
+
 
 
 
 router.get('/', (req, res) => {
-  const cats = [];
-  for (let i = 0; i < 1000; i++) {
-      cats.push({
-          id: i,
-          name: faker.animal.cat(),
-          color: faker.color.human(),
-          Image: faker.image.urlLoremFlickr({ category: 'cats' })
-      })
-  }
-  res.json(cats)
+  const cats = service.find();
+  res.status(200).json(cats)
 })
 
 router.get('/:id', (req, res) => {
   const { id } = req.params;
-  res.json({
-      id: id,
-      name: 'Kuromaru'
-  })
-})
-
-router.get('/colors/:color/cats/:id', (req, res) => {
-  const { id, color } = req.params;
-  res.json({
-      id: id,
-      name: 'Kuromaru',
-      color: color
-  })
-})
-
-router.get('/queryCats', (req, res) => {
-  const { name, color } = req.query;
-  if (!name || !color) {
+  const cat = service.findOne(id);
+  if (!cat) {
       res.status(404).json({
-          error: 'Error 404, Gatitos not found'
+          error: 'Cat not found'
       })
   }else{
-  res.json({
-      name: name,
-      color: color
-      })
+    res.status(200).json(cat)
   }
+  
+})
+
+  router.post('/', (req, res) => {
+    const body = req.body;
+    const cat = service.create(body);
+    if (!cat) {
+        res.status(400).json({
+            error: 'Cat not created'
+        })
+    }else{
+      res.status(201).json({
+          message: 'Cat created',
+          data: body
+      })
+    }
   })
 
+  router.put('/:id', (req, res) => {
+    const { id } = req.params;
+    const cat = service.update(id, req.body);
+    if (!cat) {
+        res.status(400).json({
+            error: 'Cat not updated'
+        })
+      }else{
+        res.status(200).json({
+            message: 'Cat updated',
+            data: cat,
+            id: cat.id
+        })
+      }
+  })
+
+  router.patch('/:id', (req, res) => {
+    const { id } = req.params;
+    const body = req.body;
+    const rta = service.update(id, body);
+    res.json(rta)
+  })
+
+  router.delete('/:id', (req, res) => {
+    const { id } = req.params;
+    const rta = service.delete(id);
+    res.json(rta);
+  })
   module.exports = router;
